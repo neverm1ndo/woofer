@@ -1,10 +1,39 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BotService } from './bot/bot.service';
+import { Client, Options as ClientOptions } from 'tmi.js';
 
+const clientOptions: ClientOptions = {
+  options: {
+    debug: true,
+    messagesLogLevel: "info",
+    clientId: process.env.CLIENT_ID,
+    skipUpdatingEmotesets: true
+  },
+  connection: { 
+    reconnect: true, 
+    secure: true 
+  },
+  identity: {
+    username: process.env.CLIENT_USERNAME,
+    password: process.env.CLIENT_PASSWORD
+  },
+  channels: []
+}
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot(),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService, 
+    BotService,
+    { provide: 'TMI_CLIENT', useFactory: () => {
+      return new Client(clientOptions);
+    }}
+  ],
 })
 export class AppModule {}
