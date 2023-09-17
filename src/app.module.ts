@@ -1,3 +1,5 @@
+import { join } from 'path';
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -5,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BotService } from './bot/bot.service';
 import { Client, Options as ClientOptions } from 'tmi.js';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 const clientOptions: ClientOptions = {
   options: {
@@ -22,10 +25,14 @@ const clientOptions: ClientOptions = {
     password: process.env.CLIENT_PASSWORD
   },
   channels: []
-}
+} as const;
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
   ],
   controllers: [AppController],
   providers: [
