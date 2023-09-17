@@ -25,7 +25,7 @@ const clientOptions: ClientOptions = {
     password: process.env.CLIENT_PASSWORD
   },
   channels: []
-} as const;
+};
 
 @Module({
   imports: [
