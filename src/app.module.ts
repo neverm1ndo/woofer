@@ -6,9 +6,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BotService } from './bot/bot.service';
-import { Client, Options as ClientOptions } from 'tmi.js';
+import { Client } from 'tmi.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { SoundsModule } from './sounds/sounds.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SoundsModule } from './sounds/sounds.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    MongooseModule.forRoot('mongodb://localhost:27017/woofer'),
     SoundsModule,
   ],
   controllers: [AppController],
