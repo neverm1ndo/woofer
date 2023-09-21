@@ -1,6 +1,6 @@
 import { Timestamp } from "./timestamp";
 
-interface QueueOptions {
+export interface QueueOptions {
     cooldown: number;
     global: {
         enabled: boolean;
@@ -14,16 +14,17 @@ export interface QueueChatUserstate {
 }
 
 export interface QueueItem {
-    token: Symbol;
+    token: Token;
     startTime: number;
 }
 
-type Item = Partial<QueueItem>;
+type Item = string;
+type Token = symbol;
 
 export abstract class Queue {
     
     static whitelist: unknown[] = [];
-    private _queue: Map<Symbol, number> = new Map(); 
+    private _queue: Map<Token, number> = new Map(); 
     
     public options: QueueOptions = { 
         cooldown: 0, 
@@ -56,23 +57,24 @@ export abstract class Queue {
       return this.whitelist.includes(item);
     }
     
-    async countTime(item: QueueItem): Promise<string> {
+    async countRemainTime(token: Token): Promise<string> {
       try {
         const now = Date.now();
 
-        if (this._queue.has(item.token)) throw item;
+        if (!this._queue.has(token)) throw token;
         
-        const itemQueueStartTime = this._queue.get(item.token);
+        const itemQueueStartTime = this._queue.get(token);
         return Timestamp.parseCD(this.options.cooldown * 60000 - (now - itemQueueStartTime));
       } catch (err: unknown) {
-        throw item;
+        throw token;
       }
     }
     
     public isInQueue(item: Item): boolean {
       if (this._isGlobalTimerEnabled) return true;
 
-      return this._queue.has(item.token);
+      const token: unique symbol = Symbol.for(item); 
+      return this._queue.has(token);
     }
     
     public addTime(item: QueueItem, time: number): void {
@@ -85,11 +87,10 @@ export abstract class Queue {
       if (!item) return;
       
       const now = Date.now();
-      let token = item.token;
 
-      if (!this.isInQueue(item)) {
-        token = Symbol();
-      }
+      if (this.isInQueue(item)) return;
+      
+      const token: unique symbol = Symbol(item);
 
       this._queue.set(token, now);
 
@@ -105,8 +106,9 @@ export abstract class Queue {
         this._isGlobalTimerEnabled = enabled;
     }
     
-    public removeFromQueue(user: Item): void {
-        this._queue.delete(user.token);
+    public removeFromQueue(item: Item): void {
+      const token: unique symbol = Symbol.for(item);  
+      this._queue.delete(token);
     }
   }
   
