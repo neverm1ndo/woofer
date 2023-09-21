@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { BotService } from './bot/bot.service';
 import { Client, Options as ClientOptions } from 'tmi.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { SoundsModule } from './sounds/sounds.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    SoundsModule,
   ],
   controllers: [AppController],
   providers: [
