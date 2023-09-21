@@ -9,24 +9,6 @@ import { BotService } from './bot/bot.service';
 import { Client, Options as ClientOptions } from 'tmi.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-const clientOptions: ClientOptions = {
-  options: {
-    debug: true,
-    messagesLogLevel: "info",
-    clientId: process.env.CLIENT_ID,
-    skipUpdatingEmotesets: true
-  },
-  connection: { 
-    reconnect: true, 
-    secure: true 
-  },
-  identity: {
-    username: process.env.CLIENT_USERNAME,
-    password: process.env.CLIENT_PASSWORD
-  },
-  channels: []
-};
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -39,7 +21,22 @@ const clientOptions: ClientOptions = {
     AppService, 
     BotService,
     { provide: 'TMI_CLIENT', useFactory: () => {
-      return new Client(clientOptions);
+      return new Client({
+        options: {
+          debug: true,
+          messagesLogLevel: "info",
+          skipUpdatingEmotesets: true
+        },
+        connection: { 
+          reconnect: true, 
+          secure: true 
+        },
+        identity: {
+          username: process.env.CLIENT_USERNAME,
+          password: process.env.CLIENT_OAUTH
+        },
+        channels: []
+      });
     }}
   ],
 })
