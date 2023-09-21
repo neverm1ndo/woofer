@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { SoundsService } from './sounds.service';
 
-@Module({})
+@Module({
+  providers: [SoundsService]
+})
 export class SoundsModule {}
