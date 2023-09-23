@@ -16,6 +16,7 @@ export class BotService {
         this.connect()
             .then(() => this.join('neverm1nd_o'))
             .then(() => this.handleClientMessageEvents())
+            .catch(console.error);
     }
 
     public $messages: Observable<ClientMessage> = fromEvent(this._client, 'message')

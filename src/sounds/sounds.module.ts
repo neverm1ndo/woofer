@@ -5,9 +5,9 @@ import { SoundsGateway } from './sounds.gateway';
  
 @Module({
   providers: [
-    SoundsService,
+    { provide: 'SOUNDS_QUEUE', useClass: SoundsQueue },
     SoundsGateway,
-    { provide: 'SOUNDS_QUEUE', useClass: SoundsQueue }
+    SoundsService,
   ]
 })
 export class SoundsModule {}

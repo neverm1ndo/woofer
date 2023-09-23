@@ -1,9 +1,14 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Queue, QueueOptions } from "src/shared/queue";
 
 export class SoundsQueue extends Queue {
-    constructor(@Inject() options: QueueOptions) {
-        super(options);
+    constructor() {
+        super({
+            cooldown: 900000,
+            global: {
+                enabled: true,
+            }
+        });
     }
 
     public getTokenByUsername(username: string) {

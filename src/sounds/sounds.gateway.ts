@@ -1,22 +1,36 @@
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WebSocketServer } from "@nestjs/websockets";
+import { 
+    OnGatewayConnection, 
+    OnGatewayDisconnect, 
+    OnGatewayInit, 
+    WebSocketServer, 
+    WebSocketGateway,
+} from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-
+import { SoundsService } from "./sounds.service";
+import { Sound } from "./interfaces";
+@WebSocketGateway({
+    cors: {
+      origin: '*',
+    },
+})
 export class SoundsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-    @WebSocketServer() server: Server;
+    @WebSocketServer() private _server: Server;
 
-    send(event: string, channel: string, payload: any): void {
-        try {
-            payload = JSON.stringify(payload);
-            this.server.in(channel)
-                       .emit(event, payload);
-        } catch(err) {
-            console.error(err);
-        } 
+    constructor(private _sounds: SoundsService) {}
+
+    private _send(event: string, channel: string, payload: Sound) {
+        this._server.to(channel).emit(event, payload);
     }
 
-    afterInit(server: Server) {
+    afterInit(_server: Server) {
         console.log('socket.io server init');
+        this._sounds.soundEmitter.subscribe({
+            next: ([channel, sound]: [string, Sound]) => {
+                this._send('sound::play', channel, sound);
+            },
+            error: console.error,
+        })
     }
 
     handleConnection(client: Socket, ...args: any[]) {
